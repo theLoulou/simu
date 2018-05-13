@@ -1,0 +1,55 @@
+{% extends "agents/accueil.html" %}
+{% block title %}Observation of the results{% endblock %}
+{% block intro %}
+<p>
+Here you can see the content of the database (1 row = 1 agent)<br>
+And use the form below to filter the results AFTER RUNNING THE MODEL otherwise it is useless
+</p>
+<table>
+<form action="{% url 'see' %}" method="post">
+	{% csrf_token %}
+	{{form.as_table}}
+	<tr><th>submit :</th><td><input type="submit" name="submit"></td></tr>
+</form>
+</table>
+<br>
+<table border="1">
+	<tr>
+		<th>Agent_Breed C</th>
+		<th>policy_ID</th>
+		<th>age</th>
+		<th>social_grade</th>
+		<th>payment</th>
+		<th>attribute_brand</th>
+		<th>attribute_price</th>
+		<th>attribute_promotion</th>
+		<th>auto_renew</th>
+		<th>inertia_switch</th>
+
+	</tr>
+{% endblock %}
+{% block content %}
+
+	{% for agent in Agents2 %}
+		<tr>
+			{% if agent.Ag_breedC == True %}
+			<td> C </td>
+			{% else %}
+			<td> NC </td>
+			{% endif %}
+			<td>{{ agent.policy_ID }}</td>
+			<td>{{ agent.age }}</td>
+			<td>{{ agent.social_grade }}</td>
+			<td>{{ agent.Payment }}</td>
+			<td>{{ agent.attribute_brand }}</td>
+			<td>{{ agent.attribute_price }}</td>
+			<td>{{ agent.attribute_promotion }}</td>
+			<td>{{ agent.auto_renew }}</td>
+			<td>{{ agent.inertia_switch }}</td>
+
+		</tr>
+	{% empty %}
+	<p>Agents is empty</p>
+	{% endfor %}
+{% endblock %}
+

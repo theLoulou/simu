@@ -1,0 +1,11 @@
+{% extends "agents/accueil.html" %}
+{% block title %}Run the model{% endblock %}
+{% block intro %}<p>enter the value for the brand factor, it must be a decimal number between 0.1 and 2.9 with only one decimal digit.</p>{% endblock %}
+{% block content %}
+<form action="{% url 'run' %}" method="post">
+	{% csrf_token %}
+	{{form.as_p}}
+	<input type="submit" name="submit">
+</form>
+{% endblock %}
+

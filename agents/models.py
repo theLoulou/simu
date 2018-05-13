@@ -79,10 +79,11 @@ class Ag(models.Model):
             self.results = 0
             if self.auto_renew==True:
                     if self.Ag_breedC==True:
-                        self.results =  65535
+                        self.results = 65535
                     else:
-                        self.results =  0
+                        self.results = 0
                     self.save()
+                    return True
             answer=0
             breed=self.Ag_breedC
             pay = self.Payment

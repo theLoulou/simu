@@ -45,7 +45,7 @@ def errorDB(request):
 def see(request):
 	form = filter_form(request.POST)
 	if form.is_valid():
-		#try:
+		try:
 			age = form.cleaned_data['age']
 			year = form.cleaned_data['year']
 			gained = form.cleaned_data['gained']
@@ -69,8 +69,8 @@ def see(request):
 					temp.age = agent.age + year
 					temp.Ag_breedC= agent.is_true(iteration=year)
 					Agents2.append(temp)
-		#except:
-			#return redirect('errorDB')
+		except:
+			return redirect('errorDB')
 	else:
 		Agents2 = Ag.objects.all
 	return render(request, 'agents/see.html', locals())
@@ -81,10 +81,10 @@ def run(request):
 		brand_factor = form.cleaned_data['bd']
 		Agents = Ag.objects.all()
 		title = 'end of run'
-		#try:
-		for agent in Agents:
-			agent.run(brand_factor)
-		return render(request, 'agents/accueil.html', locals())
-		#except:
-			#return redirect('errorDB')
+		try:
+			for agent in Agents:
+				agent.run(brand_factor)
+			return render(request, 'agents/accueil.html', locals())
+		except:
+			return redirect('errorDB')
 	return render(request,'agents/run.html',locals())

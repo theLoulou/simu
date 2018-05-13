@@ -15,6 +15,7 @@
 </nav>
 <h1>{% block title %}{{title}} {% endblock %}</h1>
 {% block intro %}
+
 <p>
 	Welcome on this small ugly website. 
 	<br> To better navigate the site, here are some indications :
@@ -36,6 +37,7 @@
 				<li>Use a real database : django is right now using sqlite, and while it is convenient, it is however slower than postgres for instance</li>
 				<li>regarding the database, reduce some field's sizes (the results column only needs 15 bits right now)</li>
 				<li>note : The first time I tried to load all the datas in sqlite, my pc (which is quite old) nearly froze for 15+ minutes... <br>So make sure to optimize as much as possible the data access (I reduced this latence by using a bulk insertion instead of a row-per-row, it now only takes a few seconds on my pc to load it)</li>
+				<li>the 'run' still is really slow due to a row-per-row update of the database (10 min on my pc approximately). Improving this to make it a bulk update could be a real plus. We could mix the run and read options so that the DB would quickly be ready.</li>
 			</ul>
 			<br>Expendability:
 			<ul>

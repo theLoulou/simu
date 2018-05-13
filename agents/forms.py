@@ -1,7 +1,7 @@
 from django import forms
 
 class run_form(forms.Form):
-	bd = forms.DecimalField(max_digits=2, decimal_places=1, label="brand_factor")
+	bd = forms.FloatField(label="brand_factor")
 
 	def clean_bd(self):
 		 bd = self.cleaned_data['bd']

@@ -1,4 +1,6 @@
 from django.db import models
+from django.shortcuts import redirect
+import csv, copy
 from django.utils import timezone
 import random
 
@@ -13,7 +15,7 @@ class Ag(models.Model):
     attribute_promotion = models.DecimalField(max_digits=3, decimal_places=1)
     auto_renew = models.BooleanField()
     inertia_switch = models.PositiveSmallIntegerField()
-    results = models.PositiveSmallIntegerField(default=0)
+    results = models.PositiveIntegerField(default=0)
 
 
     def is_lost(self, iteration):
@@ -24,7 +26,7 @@ class Ag(models.Model):
             res2 = self.Ag_breedC
         else:
             res2 = (res >> (iteration-2))
-        if ((res >> (iteration-1)) ^ 1) and (res2 ^ 0):
+        if (1 & ~(res >> (iteration-1))) and (res2 & 1):
             return True
         else: 
             return False	
@@ -37,7 +39,7 @@ class Ag(models.Model):
             res2 = self.Ag_breedC
         else:
             res2 = (res >> (iteration-2))
-        if ((res >> (iteration-1)) ^ 0) and (res2 ^ 1):
+        if ((res >> (iteration-1)) & 1) and (1 & ~(res2)):
             return True
         else: 
             return False
@@ -48,13 +50,15 @@ class Ag(models.Model):
             return False
         if self.is_gained(iteration=iteration):
             if iteration==2:
-                res=self.Ag_breedC
+                if (self.Ag_breedC & 1)==True:
+                    return True
+                else: 
+                    return False
             else:
-                res=(self.results >> (iteration-3))
-            if (res ^ 0):
-                return True
-            else: 
-                return False
+                if ((self.results >> (iteration-3)) & 1):
+                    return True
+                else: 
+                    return False
         else: return False
 
 
@@ -65,36 +69,40 @@ class Ag(models.Model):
             if self.Ag_breedC==True: return True
             else: return False
         else:
-            res=self.results
-            
-            if ((res >> (iteration-1)) ^ 0): return True
+            res=int(self.results)
+            if ((res >> (iteration-1)) & 1): return True
             else: return False
 
 
     def run(self, brand_factor): 
         try:
-            self.results=0
-            for i in range(1, 16):
-                if self.auto_renew==True:
+            self.results = 0
+            if self.auto_renew==True:
                     if self.Ag_breedC==True:
-                        self.results=65535
+                        self.results =  65535
                     else:
-                        self.results=0
-                    return True
-                else:
+                        self.results =  0
+                    self.save()
+            answer=0
+            breed=self.Ag_breedC
+            pay = self.Payment
+            ap= float(self.attribute_price)
+            app = float(self.attribute_promotion)
+            ifs = self.inertia_switch
+            sg = self.social_grade
+            ab = float(self.attribute_brand)
+            bf = float(brand_factor)
+            for i in range(1, 16):
                     rand=random.random() * 3
-                    affinity = self.Payment/self.attribute_price + (rand * self.attribute_promotion * self.inertia_switch)
-                    if (i==1): breed=self.Ag_breedC
-                    else:
-                        res = self.results
-                        
-                        breed=bool((res >> (i-2)) ^ 0)
-                    #if (breed==True and affinity<(self.social_grade * self.attribute_brand)): #for iteration i, set results on 0 -> we do nothing since self.results = 0 already for this 
-
-                    if (breed==False and affinity<(self.social_grade * self.attribute_brand * brand_factor)): #for iteration i, set results on 1
-                        self.results = self.results + 2**(i-1)
-            return True    
+                    affinity = (pay/ap) + (rand * app * ifs)
+                    if (i!=1): 
+                        breed=((answer >> (i-2)) & 1)
+                    if (breed==False and affinity<(sg * ab * bf)): #for iteration i, set results on 1
+                        answer = answer + 2**(i-1)
+            self.results = int(answer)
+            self.save()
+            return True   
         except:
-            return False        
+            return redirect('errorDB')        
 
 
